@@ -1,8 +1,13 @@
-name: Build APK
+name: Build APK and Web
 
 on:
   push:
   workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
@@ -16,8 +21,8 @@ jobs:
         with:
           flutter-version: '3.22.0'
 
-      - name: Generate Android project
-        run: flutter create . --platforms android --org com.travelin --project-name travel_in
+      - name: Generate project files
+        run: flutter create . --platforms android,web --org com.travelin --project-name travel_in
 
       - name: Add INTERNET permission
         run: sed -i 's|<application|<uses-permission android:name="android.permission.INTERNET"/>\n    <application|' android/app/src/main/AndroidManifest.xml
@@ -33,3 +38,27 @@ jobs:
         with:
           name: travel-in-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Build Web
+        run: flutter build web --release --base-href /travel_in/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
