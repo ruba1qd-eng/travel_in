@@ -82,9 +82,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                   ),
                 ),
                 const SizedBox(height: 24),
-                const FadeTransition(
+                FadeTransition(
                   opacity: _fade,
-                  child: Text('Travel In',
+                  child: const Text('Travel In',
                       style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
                 ),
                 const SizedBox(height: 8),
